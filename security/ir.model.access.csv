@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+cip_access,cip,model_logic_cip_form,logic_cip_coordinator,1,1,1,1
+cip_access_attendance,cip,model_logic_cip_attendance,logic_cip_coordinator,1,1,1,1
+cip_access_academic,cip,model_logic_cip_form,logic_cip_academic_head,1,1,1,1
+cip_access_attendance_academic,cip,model_logic_cip_attendance,logic_cip_academic_head,1,1,1,1
+cip_access_hr,cip,model_logic_cip_form,logic_cip_hr_manager,1,1,1,1
+cip_access_attendance_hr,cip,model_logic_cip_attendance,logic_cip_hr_manager,1,1,1,1
