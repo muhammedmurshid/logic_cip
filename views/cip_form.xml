@@ -18,6 +18,8 @@
                             string="Completed"/>
                 </header>
                 <sheet>
+                    <widget name="web_ribbon" title="Completed" bg_color="bg-success"
+                            attrs="{'invisible': [('state', '!=', 'completed')]}"/>
                     <div class="oe_title pr-0">
                         <h1 class="d-flex flex-row justify-content-between">
                             <field name="name" class="o_task_name text-truncate" placeholder="CIP Title..."
@@ -47,8 +49,8 @@
                         <page string="CIP" name="attendance">
                             <field name="cip_ids" widget="one2many">
                                 <tree string="CIP" editable="bottom">
-                                    <field name="state"/>
-                                    <field name="name"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="name" string="Student Name"/>
                                     <field name="grade"/>
                                     <field name="project_submit"
                                            attrs="{'invisible': [('state', 'in', ['draft','scheduled','started','started'])]}"/>
@@ -84,16 +86,16 @@
     </record>
 
     <record model="ir.actions.act_window" id="logic_cip_form_action">
-        <field name="name">Cip Form</field>
+        <field name="name">CIP/EXCEL</field>
         <field name="res_model">logic.cip.form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,activity</field>
     </record>
     <menuitem name="CIP"
               id="cip_main_menu"
               web_icon="logic_cip/static/description/icon.png"
               sequence="10"/>
 
-    <menuitem name="Cip Form" id="menu_cip_form"
+    <menuitem name="CIP" id="menu_cip_form"
               action="logic_cip_form_action"
               parent="cip_main_menu"
               sequence="1"/>

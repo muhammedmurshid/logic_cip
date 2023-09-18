@@ -7,8 +7,8 @@ class CipForm(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
-    batch_id = fields.Many2one('logic.base.batch', string='Batch')
-    date = fields.Date('Date')
+    batch_id = fields.Many2one('logic.base.batch', string='Batch', required=True)
+    date = fields.Date('Date', required=True)
     type_of_training = fields.Selection([
         ('cip', 'CIP'), ('excel', 'Excel'),
     ], string='Type of Training')
@@ -23,6 +23,9 @@ class CipForm(models.Model):
     coordinator_id = fields.Many2one('res.users', string='Coordinator', default=lambda self: self.env.user, readonly=1)
 
     def action_submit(self):
+
+        self.activity_schedule('logic_cip.mail_cip_activity', user_id=self.coordinator_id.id, date_deadline=self.date,
+                               note=f'CIP reminder.')
         self.state = 'scheduled'
 
     def action_start(self):
@@ -41,6 +44,9 @@ class CipForm(models.Model):
         for rec in self.cip_ids:
             rec.state = 'started'
         self.state = 'started'
+        activity = self.env['mail.activity'].search([('res_id', '=', self.id), (
+            'activity_type_id', '=', self.env.ref('logic_cip.mail_cip_activity').id)])
+        activity.action_feedback('CIP Started')
 
     def action_project(self):
         for rec in self.cip_ids:
@@ -57,17 +63,9 @@ class CipForm(models.Model):
             rec.state = 'completed'
         self.state = 'completed'
 
-    # @api.depends('state')
-    # def _compute_states(self):
-    #     print('jhfsdhgfhjs')
-    #     for rec in self:
-    #         if rec.state == 'draft':
-    #             rec.cip_ids.state = 'draft'
-    #         elif rec.state == 'scheduled':
-    #             rec.cip_ids.state = 'scheduled'
-    #         elif rec.state == 'started':
-    #             rec.cip_ids.state = 'started'
-    #         elif rec.state == 'project':
-    #             rec.cip_ids.state = 'project'
-    #         elif rec.state == 'certificate':
-    #             rec.cip_ids.state = 'certificate'
+    def _compute_display_name(self):
+        for rec in self:
+            if rec.name:
+                rec.display_name = rec.name + ' - ' + rec.batch_id.name
+            else:
+                rec.display_name = rec.batch_id.name + ' - CIP'

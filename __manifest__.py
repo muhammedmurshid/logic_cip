@@ -8,7 +8,7 @@
         'security/ir.model.access.csv',
         'security/ir_rules.xml',
         'views/cip_form.xml',
-        # 'data/activity_leads.xml',
+        'data/activity.xml',
     ],
 
     'demo': [],

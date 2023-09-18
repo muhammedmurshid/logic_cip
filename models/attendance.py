@@ -8,7 +8,7 @@ class CipAttendance(models.Model):
     name = fields.Char('Name')
     cip_id = fields.Many2one('logic.cip.form', string='Cip')
     grade = fields.Selection([
-        ('A', 'A'), ('A+', 'A+'), ('B+', 'B+'), ('B', 'B'), ('C', 'C'), ('D', 'D'),
+        ('A+', 'A+'), ('A', 'A'), ('B+', 'B+'), ('B', 'B'), ('C', 'C'), ('D', 'D'),
     ], string='Grade')
     project_submit = fields.Boolean('Project Submitted')
     certificate_submit = fields.Boolean('Certificate Submitted')
