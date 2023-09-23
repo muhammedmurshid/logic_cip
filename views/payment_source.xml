@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="excel_cip_expenses_inherit" model="ir.ui.view">
+        <field name="name">excel.view.form.inherit</field>
+        <field name="model">payment.request</field>
+        <field name="inherit_id" ref="logic_payments.payment_request_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='source_type']" position="after">
+                <field name="excel_source" attrs="{'invisible': [('source_type', '!=', 'excel')]}"
+                    string="Excel Source"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

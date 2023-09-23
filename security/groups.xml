@@ -17,6 +17,10 @@
             <field name="name">HR Manager</field>
             <field name="category_id" ref="logic_cip.model_cip_groups"/>
         </record>
+        <record id="logic_cip_programme_coordinator" model="res.groups">
+            <field name="name">Programme Coordinator</field>
+            <field name="category_id" ref="logic_cip.model_cip_groups"/>
+        </record>
 
     </data>
 </odoo>

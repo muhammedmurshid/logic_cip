@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="logic_excel_faculty_payment_form" model="ir.ui.view">
+        <field name="name">Excel Faculty Payment</field>
+        <field name="model">excel.faculty.payment</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Form">
+
+                <sheet>
+                    <h3 align="center">Efficient Faculty Payment Management in Excel</h3>
+                    <group>
+                        <group>
+                            <field name="faculty_id" required="1"/>
+                            <field name="excel_payment" required="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="logic_excel_faculty_payment_tree_view" model="ir.ui.view">
+        <field name="name">Excel Payment</field>
+        <field name="model">excel.faculty.payment</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="faculty_id"/>
+                <field name="excel_payment"/>
+            </tree>
+
+        </field>
+    </record>
+<!--    <record id="excel_payment_source" model="ir.ui.view">-->
+<!--        <field name="name">excel.view.form.inherit</field>-->
+<!--        <field name="model">payment.request</field>-->
+<!--        <field name="inherit_id" ref="logic_payments.payment_request_form_view"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//field[@name='source_type']" position="after">-->
+<!--                <field name="seminar_source" attrs="{'invisible': [('source_type', '!=', 'seminar')]}"-->
+<!--                    string="Seminar Source"/>-->
+<!--                <field name="seminar_executive" attrs="{'invisible': [('source_type', '!=', 'seminar')]}"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+    <record model="ir.actions.act_window" id="logic_excel_faculty_payment_action">
+        <field name="name">Excel Faculty Payment</field>
+        <field name="res_model">excel.faculty.payment</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem name="Excel Payment" id="menu_excel_payment_menu" action="logic_excel_faculty_payment_action"
+              parent="cip_main_menu" sequence="10" groups="logic_cip.logic_cip_hr_manager"/>
+
+</odoo>

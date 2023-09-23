@@ -10,19 +10,26 @@
                     <field name="state" widget="statusbar"/>
                     <button string="Schedule" type="object" class="oe_highlight" name="action_submit" states="draft"/>
                     <button string="Start" type="object" class="oe_highlight" name="action_start" states="scheduled"/>
-                    <button name="action_project" states="started" type="object" class="oe_highlight"
+                    <button name="action_project" states="cip_started" type="object" class="oe_highlight"
                             string="Add Project"/>
                     <button name="action_certificate" states="project" type="object" class="oe_highlight"
                             string="Add Certificate"/>
                     <button name="action_completed" states="certificate" type="object" class="oe_highlight"
                             string="Completed"/>
+                    <button name="action_excel_completed" states="excel_started" type="object" class="oe_highlight"
+                            string="Excel Completed"/>
+                    <button name="action_excel_done" states="excel_completed" type="object" class="oe_highlight"
+                            string="Excel Done"/>
+                    <button name="action_cip_started" states="cip" type="object" class="oe_highlight"
+                            string="CIP Start"/>
+
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Completed" bg_color="bg-success"
                             attrs="{'invisible': [('state', '!=', 'completed')]}"/>
                     <div class="oe_title pr-0">
                         <h1 class="d-flex flex-row justify-content-between">
-                            <field name="name" class="o_task_name text-truncate" placeholder="CIP Title..."
+                            <field name="name" class="o_task_name text-truncate" placeholder="Title..."
                                    default_focus="1"/>
 
                         </h1>
@@ -32,30 +39,84 @@
 
                             <field name="batch_id"/>
                             <field name="date"/>
-                            <field name="type_of_training"/>
+                            <field name="programme_coord_id" invisible="1"/>
+                            <!--                            <field name="type_of_training"/>-->
 
                         </group>
-                        <group>
+                        <group string="Excel Details" attrs="{'readonly': [('state', 'in', ['cip','cip_started','project','certificate','completed'])]}">
+                            <field name="day_one_date"/>
+                            <field name="day_two_date"/>
+                            <field name="day_three_date"/>
+
+                            <field name="excel_trainer"/>
+                        </group>
+                        <group string="CIP Details"
+                               attrs="{'invisible': [('state', 'in', ['draft','scheduled','excel_started','excel_completed'])]}">
+                            <field name="cip_day_one"/>
                             <field name="trainer_one"/>
+                            <field name="cip_day_two"/>
                             <field name="trainer_two"/>
+                            <field name="cip_day_three"/>
                             <field name="trainer_three"/>
                         </group>
+
                         <group>
                             <field name="coordinator_id"/>
                         </group>
 
                     </group>
-                    <notebook attrs="{'invisible': [('state', 'in', ['draft','scheduled'])]}">
-                        <page string="CIP" name="attendance">
+                    <notebook>
+                        <page string="CIP" name="attendance"
+                              attrs="{'invisible': [('state', 'in', ['draft','scheduled','excel_started','excel_completed'])]}">
                             <field name="cip_ids" widget="one2many">
-                                <tree string="CIP" editable="bottom">
+                                <tree string="CIP Record" editable="bottom">
                                     <field name="state" invisible="1"/>
+                                    <field name="student_id" invisible="1"/>
                                     <field name="name" string="Student Name"/>
+                                    <field name="day_one_cip_attendance" attrs="{'invisible': [('day_one_check', '=', False)]}"/>
+                                    <field name="day_two_cip_attendance" attrs="{'invisible': [('day_two_check', '=', False)]}"/>
+                                    <field name="day_three_cip_attendance" attrs="{'invisible': [('day_three_check', '=', False)]}"/>
+                                    <field name="day_one_check" invisible="1"/>
+                                    <field name="day_two_check" invisible="1"/>
+                                    <field name="day_three_check" invisible="1"/>
                                     <field name="grade"/>
                                     <field name="project_submit"
                                            attrs="{'invisible': [('state', 'in', ['draft','scheduled','started','started'])]}"/>
                                     <field name="certificate_submit"
                                            attrs="{'invisible': [('state', 'in', ['draft','scheduled','started','project'])]}"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Excel Record" name="excel">
+                            <field name="excel_record_ids" widget="one2many">
+                                <tree string="Excel Record" editable="bottom">
+                                    <field name="date"/>
+                                    <field name="from_time" widget="float_time"/>
+                                    <field name="to_time" widget="float_time"/>
+                                    <field name="break_reason"/>
+                                    <field name="break_time" widget="float_time"/>
+                                    <field name="total_duration"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="excel_payment_total_duration"/>
+                                <field name="payment_total"/>
+                            </group>
+                        </page>
+                        <page string="Excel Attendance" name="excel_attendance">
+                            <field name="attendance_excel_ids" widget="one2many">
+                                <tree string="Attendance" editable="bottom">
+                                    <field name="student_name"/>
+                                    <field name="day_one_attendance"
+                                           attrs="{'invisible': [('day_one_check', '=', False)]}"/>
+                                    <field name="day_two_attendance"
+                                           attrs="{'invisible': [('day_two_check', '=', False)]}"/>
+                                    <field name="day_three_attendance"
+                                           attrs="{'invisible': [('day_three_check', '=', False)]}"/>
+                                    <field name="day_one_check" invisible="1"/>
+                                    <field name="day_two_check" invisible="1"/>
+                                    <field name="day_three_check" invisible="1"/>
+                                    <field name="student_id" invisible="1"/>
                                 </tree>
                             </field>
                         </page>
@@ -79,9 +140,7 @@
                 <field name="batch_id"/>
                 <field name="date"/>
                 <field name="type_of_training"/>
-
             </tree>
-
         </field>
     </record>
 
@@ -99,6 +158,5 @@
               action="logic_cip_form_action"
               parent="cip_main_menu"
               sequence="1"/>
-
 
 </odoo>

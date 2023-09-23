@@ -6,3 +6,11 @@ cip_access_academic,cip,model_logic_cip_form,logic_cip_academic_head,1,1,1,1
 cip_access_attendance_academic,cip,model_logic_cip_attendance,logic_cip_academic_head,1,1,1,1
 cip_access_hr,cip,model_logic_cip_form,logic_cip_hr_manager,1,1,1,1
 cip_access_attendance_hr,cip,model_logic_cip_attendance,logic_cip_hr_manager,1,1,1,1
+cip_excel_payment,excel_payment,model_excel_faculty_payment,,1,1,1,1
+cip_excel_records,excel_records,model_excel_faculty_record,,1,1,1,1
+cip_access_accounts,cip,model_logic_cip_form,faculty.group_accounting_manager,1,1,1,1
+cip_access_attendance_accounts,cip,model_logic_cip_attendance,faculty.group_accounting_manager,1,1,1,1
+excel_students_attendance,cip,model_excel_students_attendance,,1,1,1,1
+cip_access_programme_coordinator,cip,model_logic_cip_form,logic_cip_programme_coordinator,1,1,1,1
+cip_access_attendance_pro,cip,model_logic_cip_attendance,logic_cip_programme_coordinator,1,1,1,1
+

@@ -5,8 +5,14 @@
         <record model="ir.rule" id="coordinator_rule_cip">
             <field name="name">CIP Coordinator view</field>
             <field name="model_id" ref="model_logic_cip_form"/>
-            <field name="domain_force">[('coordinator_id.id','=', user.id)]</field>
+            <field name="domain_force">['|',('create_uid', '=', user.id),('coordinator_id.id','=', user.id)]</field>
             <field name="groups" eval="[(4, ref('logic_cip_coordinator'))]"/>
+        </record>
+        <record model="ir.rule" id="programme_coordinator_rule_cip">
+            <field name="name">Programme Coordinator view</field>
+            <field name="model_id" ref="model_logic_cip_form"/>
+            <field name="domain_force">[('programme_coord_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('logic_cip_programme_coordinator'))]"/>
         </record>
         <record model="ir.rule" id="academic_head_rule_cip">
             <field name="name">CIP Academic Head view</field>

@@ -13,6 +13,20 @@ class CipAttendance(models.Model):
     project_submit = fields.Boolean('Project Submitted')
     certificate_submit = fields.Boolean('Certificate Submitted')
     state = fields.Selection([
-        ('draft', 'Draft'), ('scheduled', 'Scheduled'), ('started', 'Started'), ('project', 'Project'),
+        ('draft', 'Draft'), ('scheduled', 'Scheduled'), ('excel_started', 'Excel Started'),
+        ('excel_completed', 'Excel Completed'), ('cip', 'CIP'), ('cip_started', 'CIP Started'), ('project', 'Project'),
         ('certificate', 'Certificate'), ('completed', 'Completed'),
     ], default='draft')
+    day_one_cip_attendance = fields.Selection([
+        ('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')
+    ], string='Day One')
+    day_two_cip_attendance = fields.Selection([
+        ('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')
+    ], string='Day Two')
+    day_three_cip_attendance = fields.Selection([
+        ('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')
+    ], string='Day Three')
+    day_one_check = fields.Boolean('Day One')
+    day_two_check = fields.Boolean('Day Two')
+    day_three_check = fields.Boolean('Day Three')
+    student_id = fields.Integer()
