@@ -26,6 +26,28 @@ class CipAttendance(models.Model):
     day_three_cip_attendance = fields.Selection([
         ('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')
     ], string='Day Three')
+
+    stud_attendance = fields.Float(string="Attendance",compute="_compute_stud_attendance")
+    
+    def _compute_stud_attendance(self):
+        for record in self:
+            total_present = 0
+            if record.day_one_cip_attendance=="full_day":
+                total_present+=1
+            elif record.day_one_cip_attendance=="half_day":
+                total_present+=0.5
+
+            if record.day_two_cip_attendance=="full_day":
+                total_present+=1
+            elif record.day_two_cip_attendance=="half_day":
+                total_present+=0.5
+
+            if record.day_three_cip_attendance=="full_day":
+                total_present+=1
+            elif record.day_three_cip_attendance=="half_day":
+                total_present+=0.5
+            record.stud_attendance = total_present
+
     day_one_check = fields.Boolean('Day One')
     day_two_check = fields.Boolean('Day Two')
     day_three_check = fields.Boolean('Day Three')

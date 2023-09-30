@@ -352,6 +352,27 @@ class ExcelClassAttendance(models.Model):
     day_three_attendance = fields.Selection([('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')],
                                             'Day 3')
     
+    stud_attendance = fields.Float(string="Attendance",compute="_compute_stud_attendance")
+
+    def _compute_stud_attendance(self):
+        for record in self:
+            total_present = 0
+            if record.day_one_attendance=="full_day":
+                total_present+=1
+            elif record.day_one_attendance=="half_day":
+                total_present+=0.5
+
+            if record.day_two_attendance=="full_day":
+                total_present+=1
+            elif record.day_two_attendance=="half_day":
+                total_present+=0.5
+
+            if record.day_three_attendance=="full_day":
+                total_present+=1
+            elif record.day_three_attendance=="half_day":
+                total_present+=0.5
+            record.stud_attendance = total_present
+
     # @api.onchange('day_one_check')
     # def on_day_one_check_change(self):
     #     for record in self:
