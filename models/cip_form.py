@@ -95,6 +95,7 @@ class CipForm(models.Model):
         for rec in self.cip_ids:
             rec.state = 'project'
         self.state = 'project'
+        self.cip_ids.project_submit = True
 
     def action_excel_completed(self):
         for rec in self.cip_ids:
@@ -140,6 +141,8 @@ class CipForm(models.Model):
         for rec in self.cip_ids:
             rec.state = 'certificate'
         self.state = 'certificate'
+        self.cip_ids.certificate_submit = True
+
 
     def action_completed(self):
         for rec in self.cip_ids:
@@ -213,32 +216,54 @@ class CipForm(models.Model):
         print('yes')
         if self.day_one_date:
             self.attendance_excel_ids.day_one_check = True
+            self.attendance_excel_ids.day_one_attendance = "full_day"
         else:
             self.attendance_excel_ids.day_one_check = False
+            self.attendance_excel_ids.day_one_attendance = False
+
         if self.day_two_date:
             self.attendance_excel_ids.day_two_check = True
+            self.attendance_excel_ids.day_two_attendance = "full_day"
+
         else:
             self.attendance_excel_ids.day_two_check = False
+            self.attendance_excel_ids.day_two_attendance = False
+
         if self.day_three_date:
             self.attendance_excel_ids.day_three_check = True
+            self.attendance_excel_ids.day_three_attendance = "full_day"
+
         else:
             self.attendance_excel_ids.day_three_check = False
+            self.attendance_excel_ids.day_three_attendance = False
+
 
     @api.onchange('cip_day_one', 'cip_day_two', 'cip_day_three')
     def _onchange_cip_date_attendance(self):
         print('yes')
         if self.cip_day_one:
             self.cip_ids.day_one_check = True
+            self.cip_ids.day_one_cip_attendance = "full_day"
         else:
             self.cip_ids.day_one_check = False
+            self.cip_ids.day_one_cip_attendance = False
+
         if self.cip_day_two:
             self.cip_ids.day_two_check = True
+            self.cip_ids.day_two_cip_attendance = "full_day"
+
         else:
             self.cip_ids.day_two_check = False
+            self.cip_ids.day_two_cip_attendance = False
+
         if self.cip_day_three:
             self.cip_ids.day_three_check = True
+            self.cip_ids.day_three_cip_attendance = "full_day"
+
         else:
             self.cip_ids.day_three_check = False
+            self.cip_ids.day_three_cip_attendance = False
+
 
 
 class ExcelClassAttendance(models.Model):
@@ -251,6 +276,31 @@ class ExcelClassAttendance(models.Model):
                                           'Day 2')
     day_three_attendance = fields.Selection([('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')],
                                             'Day 3')
+    
+    # @api.onchange('day_one_check')
+    # def on_day_one_check_change(self):
+    #     for record in self:
+    #         if record.day_one_check:
+    #             record.day_one_attendance = 'full_day'
+    #         else:
+    #             record.day_one_attendance = False
+
+    # @api.onchange('day_two_check')
+    # def on_day_two_check_change(self):
+    #     for record in self:
+    #         if record.day_two_check:
+    #             record.day_two_attendance = 'full_day'
+    #         else:
+    #             record.day_two_attendance = False
+
+    # @api.onchange('day_three_check')
+    # def on_day_three_check_change(self):
+    #     for record in self:
+    #         if record.day_three_check:
+    #             record.day_three_attendance = 'full_day'
+    #         else:
+    #             record.day_three_attendance = False
+
     students_excel_id = fields.Many2one('logic.cip.form')
     student_id = fields.Integer()
     day_one_check = fields.Boolean('Day One')
