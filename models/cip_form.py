@@ -18,6 +18,81 @@ class CipForm(models.Model):
     name = fields.Char()
     batch_id = fields.Many2one('logic.base.batch', string='Batch', required=True)
     date = fields.Date('Date', default=lambda self: fields.Date.context_today(self))
+    batch_strength = fields.Integer(string="Strength",compute = "_compute_batch_strength")
+    cip_avg_attendance = fields.Float(string="Average CIP Attendance",compute="_compute_cip_avg_attendance")
+    excel_avg_attendance = fields.Float(string="Average Excel Attendance",compute="_compute_excel_avg_attendance")
+
+    def _compute_excel_avg_attendance(self):
+        for record in self:
+            if record.attendance_excel_ids:
+                total_attendance = 0
+                for excel_rec in record.attendance_excel_ids:
+                    if record.day_one_date:
+                        if excel_rec.day_one_attendance=='full_day':
+                            total_attendance+=1
+                        elif excel_rec.day_one_attendance=="half_day":
+                            total_attendance+=0.5
+                    if record.day_two_date:
+                        if excel_rec.day_two_attendance=='full_day':
+                            total_attendance+=1
+                        elif excel_rec.day_two_attendance=="half_day":
+                            total_attendance+=0.5
+                    if record.day_three_date:
+
+                        if excel_rec.day_three_attendance=='full_day':
+                            total_attendance+=1
+                        elif excel_rec.day_three_attendance=="half_day":
+                            total_attendance+=0.5
+                if record.day_one_date and record.day_two_date and record.day_three_date:
+                    record.excel_avg_attendance = total_attendance/3
+                elif record.day_one_date and record.day_two_date:
+                    record.excel_avg_attendance = total_attendance/2
+                else:
+                    record.excel_avg_attendance = total_attendance
+            else:
+                record.excel_avg_attendance = 0
+
+    def _compute_cip_avg_attendance(self):
+        for record in self:
+            if record.cip_ids:
+                total_attendance = 0
+                for cip_rec in record.cip_ids:
+                    if record.cip_day_one:
+                        if cip_rec.day_one_cip_attendance=='full_day':
+                            total_attendance+=1
+                        elif cip_rec.day_one_cip_attendance=="half_day":
+                            total_attendance+=0.5
+                    if record.cip_day_two:
+                        if cip_rec.day_two_cip_attendance=='full_day':
+                            total_attendance+=1
+                        elif cip_rec.day_two_cip_attendance=="half_day":
+                            total_attendance+=0.5
+                    if record.cip_day_three:
+
+                        if cip_rec.day_three_cip_attendance=='full_day':
+                            total_attendance+=1
+                        elif cip_rec.day_three_cip_attendance=="half_day":
+                            total_attendance+=0.5
+                if record.cip_day_one and record.cip_day_two and record.cip_day_three:
+                    record.cip_avg_attendance = total_attendance/3
+                elif record.cip_day_one and record.cip_day_two:
+                    record.cip_avg_attendance = total_attendance/2
+                else:
+                    record.cip_avg_attendance = total_attendance
+            else:
+                record.cip_avg_attendance = 0
+
+    @api.depends('batch_id')
+    def _compute_batch_strength(self):
+        for record in self:
+            if record.batch_id:
+                record.batch_strength = self.env['logic.students'].search_count([('batch_id','=',record.batch_id.id)])    
+            else:
+                record.batch_strength = 0
+
+
+    
+            
     type_of_training = fields.Selection([
         ('cip', 'CIP'), ('excel', 'Excel'),
     ], string='Type of Training')
@@ -26,7 +101,7 @@ class CipForm(models.Model):
         ('draft', 'Draft'), ('scheduled', 'Scheduled'), ('excel_started', 'Excel Started'),
         ('excel_completed', 'Excel Completed'), ('cip', 'CIP'), ('cip_started', 'CIP Started'), ('project', 'Project'),
         ('certificate', 'Certificate'), ('completed', 'Completed'),
-    ], default='draft')
+    ], default='draft', string="Status")
     cip_ids = fields.One2many('logic.cip.attendance', 'cip_id', string='Attendance')
     day_one_date = fields.Date('Day One')
     day_two_date = fields.Date('Date Two')

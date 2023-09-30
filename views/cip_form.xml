@@ -37,11 +37,12 @@
                     <group>
                         <group>
 
-                            <field name="batch_id"/>
+                            <field name="batch_id" context="{'custom_name_display':True}"/>
                             <field name="date"/>
                             <field name="programme_coord_id" invisible="1"/>
                             <!--                            <field name="type_of_training"/>-->
-
+                            <field name="cip_avg_attendance"/>
+                            <field name="excel_avg_attendance"/>
                         </group>
                         <group string="Excel Details" attrs="{'readonly': [('state', 'in', ['cip','cip_started','project','certificate','completed'])]}">
                             <field name="day_one_date"/>
@@ -135,11 +136,14 @@
         <field name="model">logic.cip.form</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="name"/>
-                <field name="coordinator_id"/>
-                <field name="batch_id"/>
+                <!-- <field name="name"/> -->
                 <field name="date"/>
-                <field name="type_of_training"/>
+                <field name="batch_id"/>
+                <field name="coordinator_id"/>
+                <field name="cip_avg_attendance"/>
+                <field name="excel_avg_attendance"/>
+                <field name="batch_strength"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
