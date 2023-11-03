@@ -117,9 +117,11 @@ class CipForm(models.Model):
     cip_day_one = fields.Date('Day One')
     cip_day_two = fields.Date('Day Two')
     cip_day_three = fields.Date('Day Three')
+    cip_day_four = fields.Date('Day Four')
     trainer_one = fields.Char('Trainer')
     trainer_two = fields.Char('Trainer')
     trainer_three = fields.Char('Trainer')
+    trainer_four = fields.Char('Trainer')
 
     def action_submit(self):
         self.activity_schedule('logic_cip.mail_cip_activity', user_id=self.coordinator_id.id,
@@ -240,6 +242,9 @@ class CipForm(models.Model):
                     if self.cip_day_three:
                         i.day_three_cip = self.cip_day_three
                         i.day_three_cip_attendance = rec.day_three_cip_attendance
+                    if self.cip_day_four:
+                        i.day_four_cip = self.cip_day_four
+                        i.day_four_cip_attendance = rec.day_four_cip_attendance
                 else:
                     print('na')
 
@@ -286,7 +291,7 @@ class CipForm(models.Model):
 
     payment_total = fields.Float(string='Total Payment', compute='_compute_total_record', store=True)
 
-    @api.onchange('day_one_date', 'day_two_date', 'day_three_date')
+    @api.onchange('day_one_date', 'day_two_date', 'day_three_date', 'day_four_date')
     def _onchange_excel_date_one_test(self):
         print('yes')
         if self.day_one_date:
@@ -338,6 +343,14 @@ class CipForm(models.Model):
         else:
             self.cip_ids.day_three_check = False
             self.cip_ids.day_three_cip_attendance = False
+
+        if self.cip_day_four:
+            self.cip_ids.day_four_check = True
+            self.cip_ids.day_four_cip_attendance = "full_day"
+
+        else:
+            self.cip_ids.day_four_check = False
+            self.cip_ids.day_four_cip_attendance = False
 
 
 
