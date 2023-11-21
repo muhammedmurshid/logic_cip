@@ -17,6 +17,7 @@ class CipForm(models.Model):
 
     name = fields.Char()
     batch_id = fields.Many2one('logic.base.batch', string='Batch', required=True)
+    branch = fields.Many2one('logic.base.branches', related='batch_id.branch_id', string='Branch')
     date = fields.Date('Date', default=lambda self: fields.Date.context_today(self))
     batch_strength = fields.Integer(string="Strength",compute = "_compute_batch_strength")
     cip_avg_attendance = fields.Float(string="Average CIP Attendance",compute="_compute_cip_avg_attendance")
