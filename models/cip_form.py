@@ -22,6 +22,10 @@ class CipForm(models.Model):
     batch_strength = fields.Integer(string="Strength",compute = "_compute_batch_strength")
     cip_avg_attendance = fields.Float(string="Average CIP Attendance",compute="_compute_cip_avg_attendance")
     excel_avg_attendance = fields.Float(string="Average Excel Attendance",compute="_compute_excel_avg_attendance")
+    digital_support_received = fields.Boolean(string='Digital Support Received')
+    rating = fields.Selection(
+        selection=[('0', 'No rating'), ('1', 'Very Poor'), ('2', 'Poor'), ('3', 'Average'), ('4', 'Good'),
+                   ('5', 'Very Good')], string="Rating", default='0')
 
     def _compute_excel_avg_attendance(self):
         for record in self:

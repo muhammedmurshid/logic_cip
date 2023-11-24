@@ -64,6 +64,11 @@
                             <field name="trainer_four"/>
                         </group>
 
+
+                        <group string="Rating" attrs="{'invisible': [('state', '!=', 'completed')]}">
+                            <field name="digital_support_received"/>
+                            <field name="rating" widget="priority" attrs="{'invisible': [('digital_support_received', '!=', True)]}"/>
+                        </group>
                         <group>
                             <field name="coordinator_id"/>
                         </group>
