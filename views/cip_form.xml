@@ -38,6 +38,7 @@
                         <group>
 
                             <field name="batch_id" context="{'custom_name_display':True}"/>
+                            <field name="course_id"/>
                             <field name="branch"/>
                             <field name="date"/>
                             <field name="programme_coord_id" invisible="1"/>
