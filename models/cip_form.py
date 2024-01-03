@@ -28,6 +28,19 @@ class CipForm(models.Model):
         selection=[('0', 'No rating'), ('1', 'Very Poor'), ('2', 'Poor'), ('3', 'Average'), ('4', 'Good'),
                    ('5', 'Very Good')], string="Rating", default='0')
 
+    def action_excel_change_student_field_relation(self):
+        rec = self.env['excel.students.attendance'].sudo().search([])
+        for j in rec:
+            students = self.env['logic.students'].sudo().search([('id', '=', j.student_id)])
+            j.base_student_id = students.id
+
+    def action_cip_change_student_field_relation(self):
+        rec = self.env['logic.cip.attendance'].sudo().search([])
+        for j in rec:
+            students = self.env['logic.students'].sudo().search([('id', '=', j.student_id)])
+            j.base_student_id = students.id
+
+
     def _compute_excel_avg_attendance(self):
         for record in self:
             if record.attendance_excel_ids:
@@ -64,25 +77,58 @@ class CipForm(models.Model):
                 total_attendance = 0
                 for cip_rec in record.cip_ids:
                     if record.cip_day_one:
-                        if cip_rec.day_one_cip_attendance=='full_day':
+                        if cip_rec.day_one_cip_attendance == 'full_day':
                             total_attendance+=1
                         elif cip_rec.day_one_cip_attendance=="half_day":
                             total_attendance+=0.5
                     if record.cip_day_two:
-                        if cip_rec.day_two_cip_attendance=='full_day':
-                            total_attendance+=1
-                        elif cip_rec.day_two_cip_attendance=="half_day":
-                            total_attendance+=0.5
+                        if cip_rec.day_two_cip_attendance == 'full_day':
+                            total_attendance += 1
+                        elif cip_rec.day_two_cip_attendance == "half_day":
+                            total_attendance += 0.5
                     if record.cip_day_three:
 
-                        if cip_rec.day_three_cip_attendance=='full_day':
-                            total_attendance+=1
-                        elif cip_rec.day_three_cip_attendance=="half_day":
-                            total_attendance+=0.5
-                if record.cip_day_one and record.cip_day_two and record.cip_day_three:
+                        if cip_rec.day_three_cip_attendance == 'full_day':
+                            total_attendance += 1
+                        elif cip_rec.day_three_cip_attendance == "half_day":
+                            total_attendance += 0.5
+                    if record.cip_day_four:
+
+                        if cip_rec.day_four_cip_attendance == 'full_day':
+                            total_attendance += 1
+                        elif cip_rec.day_four_cip_attendance == "half_day":
+                            total_attendance += 0.5
+                    if record.cip_day_five:
+                        if cip_rec.day_five_cip_attendance == 'full_day':
+                            total_attendance += 1
+                        elif cip_rec.day_five_cip_attendance == "half_day":
+                            total_attendance += 0.5
+                    if record.cip_day_six:
+                        if cip_rec.day_six_cip_attendance == 'full_day':
+                            total_attendance += 1
+                        elif cip_rec.day_six_cip_attendance == "half_day":
+                            total_attendance += 0.5
+                    if record.cip_day_seven:
+                        if cip_rec.day_seven_cip_attendance == 'full_day':
+                            total_attendance += 1
+                        elif cip_rec.day_seven_cip_attendance == "half_day":
+                            total_attendance += 0.5
+                print(total_attendance, "total_attendance")
+
+                if record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five and record.cip_day_six and record.cip_day_seven:
+                    record.cip_avg_attendance = total_attendance/7
+                elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five and record.cip_day_six:
+                    record.cip_avg_attendance = total_attendance/6
+                elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five:
+                    record.cip_avg_attendance = total_attendance/5
+                elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four:
+                    record.cip_avg_attendance = total_attendance/4
+                elif record.cip_day_one and record.cip_day_two and record.cip_day_three:
                     record.cip_avg_attendance = total_attendance/3
                 elif record.cip_day_one and record.cip_day_two:
                     record.cip_avg_attendance = total_attendance/2
+                elif record.cip_day_one:
+                    record.cip_avg_attendance = total_attendance/1
                 else:
                     record.cip_avg_attendance = total_attendance
             else:
@@ -128,6 +174,12 @@ class CipForm(models.Model):
     trainer_two = fields.Char('Trainer')
     trainer_three = fields.Char('Trainer')
     trainer_four = fields.Char('Trainer')
+    cip_day_five = fields.Date('Day Five')
+    cip_day_six = fields.Date('Day Six')
+    cip_day_seven = fields.Date('Day Seven')
+    trainer_five = fields.Char('Trainer')
+    trainer_six = fields.Char('Trainer')
+    trainer_seven = fields.Char('Trainer')
 
     def action_submit(self):
         self.activity_schedule('logic_cip.mail_cip_activity', user_id=self.coordinator_id.id,
@@ -145,8 +197,9 @@ class CipForm(models.Model):
 
         for i in students:
             res_list = {
-                'student_name': i.name,
+                # 'student_name': i.name,
                 'student_id': i.id,
+                'base_student_id': i.id
 
             }
             abc.append((0, 0, res_list))
@@ -161,8 +214,9 @@ class CipForm(models.Model):
 
         for i in students:
             res_list = {
-                'name': i.name,
+                # 'name': i.name,
                 'student_id': i.id,
+                'base_student_id': i.id
 
             }
             abc.append((0, 0, res_list))
@@ -201,7 +255,7 @@ class CipForm(models.Model):
             for rec in self.attendance_excel_ids:
                 print(rec.student_id, 'rec')
                 print(i.id, 'id')
-                if rec.student_id == i.id:
+                if rec.base_student_id == i.id:
                     print('ya')
                     if self.day_one_date:
                         i.day_one_excel = self.day_one_date
@@ -237,7 +291,7 @@ class CipForm(models.Model):
             for rec in self.cip_ids:
                 print(rec.student_id, 'rec')
                 print(i.id, 'id')
-                if rec.student_id == i.id:
+                if rec.base_student_id == i.id:
                     print('ya')
                     if self.cip_day_one:
                         i.day_one_cip = self.cip_day_one
@@ -251,6 +305,15 @@ class CipForm(models.Model):
                     if self.cip_day_four:
                         i.day_four_cip = self.cip_day_four
                         i.day_four_cip_attendance = rec.day_four_cip_attendance
+                    if self.cip_day_five:
+                        i.day_five_cip = self.cip_day_five
+                        i.day_five_cip_attendance = rec.day_five_cip_attendance
+                    if self.cip_day_six:
+                        i.day_six_cip = self.cip_day_six
+                        i.day_six_cip_attendance = rec.day_six_cip_attendance
+                    if self.cip_day_seven:
+                        i.day_seven_cip = self.cip_day_seven
+                        i.day_seven_cip_attendance = rec.day_seven_cip_attendance
                 else:
                     print('na')
 
@@ -324,7 +387,7 @@ class CipForm(models.Model):
             self.attendance_excel_ids.day_three_attendance = False
 
 
-    @api.onchange('cip_day_one', 'cip_day_two', 'cip_day_three')
+    @api.onchange('cip_day_one', 'cip_day_two', 'cip_day_three', 'cip_day_four', 'cip_day_five', 'cip_day_six', 'cip_day_seven')
     def _onchange_cip_date_attendance(self):
         print('yes')
         if self.cip_day_one:
@@ -358,12 +421,33 @@ class CipForm(models.Model):
             self.cip_ids.day_four_check = False
             self.cip_ids.day_four_cip_attendance = False
 
+        if self.cip_day_five:
+            self.cip_ids.day_five_check = True
+            self.cip_ids.day_five_cip_attendance = "full_day"
+        else:
+            self.cip_ids.day_five_check = False
+            self.cip_ids.day_five_cip_attendance = False
+
+        if self.cip_day_six:
+            self.cip_ids.day_six_check = True
+            self.cip_ids.day_six_cip_attendance = "full_day"
+        else:
+            self.cip_ids.day_six_check = False
+            self.cip_ids.day_six_cip_attendance = False
+
+        if self.cip_day_seven:
+            self.cip_ids.day_seven_check = True
+            self.cip_ids.day_seven_cip_attendance = "full_day"
+        else:
+            self.cip_ids.day_seven_check = False
+            self.cip_ids.day_seven_cip_attendance = False
 
 
 class ExcelClassAttendance(models.Model):
     _name = 'excel.students.attendance'
 
     student_name = fields.Char('Student Name')
+    base_student_id = fields.Many2one('logic.students', 'Student Name')
     day_one_attendance = fields.Selection([('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')],
                                           'Day 1')
     day_two_attendance = fields.Selection([('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')],
@@ -390,6 +474,22 @@ class ExcelClassAttendance(models.Model):
                 total_present+=1
             elif record.day_three_attendance=="half_day":
                 total_present+=0.5
+            # if record.day_four_attendance=="full_day":
+            #     total_present+=1
+            # elif record.day_four_attendance=="half_day":
+            #     total_present+=0.5
+            # if record.day_five_attendance=="full_day":
+            #     total_present+=1
+            # elif record.day_five_attendance=="half_day":
+            #     total_present+=0.5
+            # if record.day_six_attendance=="full_day":
+            #     total_present+=1
+            # elif record.day_six_attendance=="half_day":
+            #     total_present+=0.5
+            # if record.day_seven_attendance=="full_day":
+            #     total_present+=1
+            # elif record.day_seven_attendance=="half_day":
+            #     total_present+=0.5
             record.stud_attendance = total_present
 
     # @api.onchange('day_one_check')
@@ -421,3 +521,6 @@ class ExcelClassAttendance(models.Model):
     day_one_check = fields.Boolean('Day One')
     day_two_check = fields.Boolean('Day Two')
     day_three_check = fields.Boolean('Day Three')
+    day_five_check = fields.Boolean('Day Five')
+    day_six_check = fields.Boolean('Day Six')
+    day_seven_check = fields.Boolean('Day Seven')

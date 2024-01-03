@@ -42,6 +42,7 @@
                             <field name="branch"/>
                             <field name="date"/>
                             <field name="programme_coord_id" invisible="1"/>
+                            <field name="cip_day_one" placeholder="cip day one"/>
                             <!--                            <field name="type_of_training"/>-->
                             <field name="cip_avg_attendance"/>
                             <field name="excel_avg_attendance"/>
@@ -55,14 +56,14 @@
                         </group>
                         <group string="CIP Details"
                                attrs="{'invisible': [('state', 'in', ['draft','scheduled','excel_started','excel_completed'])]}">
-                            <field name="cip_day_one"/>
-                            <field name="trainer_one"/>
-                            <field name="cip_day_two"/>
-                            <field name="trainer_two"/>
-                            <field name="cip_day_three"/>
-                            <field name="trainer_three"/>
-                            <field name="cip_day_four"/>
-                            <field name="trainer_four"/>
+                            <field name="cip_day_one" placeholder="cip day one"/>
+                            <field name="trainer_one" placeholder="trainer"/>
+                            <field name="cip_day_two" placeholder="cip day two"/>
+                            <field name="trainer_two" placeholder="trainer"/>
+                            <field name="cip_day_three" placeholder="cip day three"/>
+                            <field name="trainer_three" placeholder="trainer"/>
+                            <field name="cip_day_four" placeholder="cip day four"/>
+                            <field name="trainer_four" placeholder="trainer"/>
                         </group>
 
 
@@ -70,8 +71,14 @@
                             <field name="digital_support_received"/>
                             <field name="rating" widget="priority" attrs="{'invisible': [('digital_support_received', '!=', True)]}"/>
                         </group>
-                        <group>
-                            <field name="coordinator_id"/>
+                        <group attrs="{'invisible': [('state', 'in', ['draft','scheduled','excel_started','excel_completed'])]}">
+                            <field name="coordinator_id" groups="base.group_no_one"/>
+                            <field name="cip_day_five" placeholder="cip day five"/>
+                            <field name="trainer_five" placeholder="trainer"/>
+                            <field name="cip_day_six" placeholder="cip day six"/>
+                            <field name="trainer_six" placeholder="trainer"/>
+                            <field name="cip_day_seven" placeholder="cip day seven"/>
+                            <field name="trainer_seven" placeholder="trainer"/>
                         </group>
 
                     </group>
@@ -82,16 +89,24 @@
                                 <tree string="CIP Record" editable="bottom">
                                     <field name="state" invisible="1"/>
                                     <field name="student_id" invisible="1"/>
+                                    <field name="base_student_id"/>
                                     <field name="name" string="Student Name"/>
                                     <field name="day_one_cip_attendance" attrs="{'invisible': [('day_one_check', '=', False)]}"/>
                                     <field name="day_two_cip_attendance" attrs="{'invisible': [('day_two_check', '=', False)]}"/>
                                     <field name="day_three_cip_attendance" attrs="{'invisible': [('day_three_check', '=', False)]}"/>
                                     <field name="day_four_cip_attendance" attrs="{'invisible': [('day_four_check', '=', False)]}"/>
+                                    <field name="day_five_cip_attendance" attrs="{'invisible': [('day_five_check', '=', False)]}"/>
+                                    <field name="day_six_cip_attendance" attrs="{'invisible': [('day_six_check', '=', False)]}"/>
+                                    <field name="day_seven_cip_attendance" attrs="{'invisible': [('day_seven_check', '=', False)]}"/>
                                     <field name="stud_attendance"/>
+
                                     <field name="day_one_check" invisible="1"/>
                                     <field name="day_two_check" invisible="1"/>
                                     <field name="day_three_check" invisible="1"/>
                                     <field name="day_four_check" invisible="1"/>
+                                    <field name="day_five_check" invisible="1"/>
+                                    <field name="day_six_check" invisible="1"/>
+                                    <field name="day_seven_check" invisible="1"/>
                                     <field name="grade"/>
                                     <field name="project_submit"
                                            attrs="{'invisible': [('state', 'in', ['draft','scheduled','started','started'])]}"/>
@@ -119,6 +134,7 @@
                         <page string="Excel Attendance" name="excel_attendance">
                             <field name="attendance_excel_ids" widget="one2many">
                                 <tree string="Attendance" editable="bottom">
+                                    <field name="base_student_id"/>
                                     <field name="student_name"/>
                                     <field name="day_one_attendance"
                                            attrs="{'invisible': [('day_one_check', '=', False)]}"/>
@@ -166,6 +182,25 @@
         <field name="res_model">logic.cip.form</field>
         <field name="view_mode">tree,form,activity</field>
     </record>
+
+    <record id="server_action_for_excel_student_name_changing" model="ir.actions.server">
+        <field name="name">Change excel student field</field>
+        <field name="model_id" ref="logic_cip.model_logic_cip_form"/>
+        <field name="binding_model_id" ref="logic_cip.model_logic_cip_form"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_excel_change_student_field_relation()</field>
+    </record>
+
+    <record id="server_action_for_cip_student_name_changing" model="ir.actions.server">
+        <field name="name">Change cip student field</field>
+        <field name="model_id" ref="logic_cip.model_logic_cip_form"/>
+        <field name="binding_model_id" ref="logic_cip.model_logic_cip_form"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cip_change_student_field_relation()</field>
+    </record>
+
     <menuitem name="CIP"
               id="cip_main_menu"
               web_icon="logic_cip/static/description/icon.png"

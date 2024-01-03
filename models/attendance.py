@@ -29,6 +29,15 @@ class CipAttendance(models.Model):
     day_four_cip_attendance = fields.Selection([
         ('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')
     ], string='Day Four')
+    day_five_cip_attendance = fields.Selection([
+        ('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')
+    ], string='Day Five')
+    day_six_cip_attendance = fields.Selection([
+        ('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')
+    ], string='Day Six')
+    day_seven_cip_attendance = fields.Selection([
+        ('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')
+    ], string='Day Seven')
 
     stud_attendance = fields.Float(string="Attendance",compute="_compute_stud_attendance")
     
@@ -54,10 +63,28 @@ class CipAttendance(models.Model):
                 total_present+=1
             elif record.day_four_cip_attendance=="half_day":
                 total_present+=0.5
+            if record.day_five_cip_attendance=="full_day":
+                total_present+=1
+            elif record.day_five_cip_attendance=="half_day":
+                total_present+=0.5
+
+            if record.day_six_cip_attendance=="full_day":
+                total_present+=1
+            elif record.day_six_cip_attendance=="half_day":
+                total_present+=0.5
+
+            if record.day_seven_cip_attendance=="full_day":
+                total_present+=1
+            elif record.day_seven_cip_attendance=="half_day":
+                total_present+=0.5
             record.stud_attendance = total_present
 
     day_one_check = fields.Boolean('Day One')
     day_two_check = fields.Boolean('Day Two')
     day_three_check = fields.Boolean('Day Three')
     day_four_check = fields.Boolean('Day Four')
+    day_five_check = fields.Boolean('Day Five')
+    day_six_check = fields.Boolean('Day Six')
+    day_seven_check = fields.Boolean('Day Seven')
     student_id = fields.Integer()
+    base_student_id = fields.Many2one('logic.students', string='Student')
