@@ -46,6 +46,7 @@
                             <!--                            <field name="type_of_training"/>-->
                             <field name="cip_avg_attendance"/>
                             <field name="excel_avg_attendance"/>
+
                         </group>
                         <group string="Excel Details" attrs="{'readonly': [('state', 'in', ['cip','cip_started','project','certificate','completed'])]}">
                             <field name="day_one_date"/>
@@ -80,6 +81,12 @@
                             <field name="cip_day_seven" placeholder="cip day seven"/>
                             <field name="trainer_seven" placeholder="trainer"/>
                         </group>
+                        <group string="Count" groups="base.group_no_one">
+                            <field name="cip_attended_students_count" groups="base.group_no_one"/>
+                            <field groups="base.group_no_one" name="total_cip_attendance"/>
+                            <field name="total_excel_attendance"  groups="base.group_no_one"/>
+                            <field name="excel_attended_students_count"  groups="base.group_no_one"/>
+                        </group>
 
                     </group>
                     <notebook>
@@ -90,7 +97,6 @@
                                     <field name="state" invisible="1"/>
                                     <field name="student_id" invisible="1"/>
                                     <field name="base_student_id"/>
-                                    <field name="name" string="Student Name"/>
                                     <field name="day_one_cip_attendance" attrs="{'invisible': [('day_one_check', '=', False)]}"/>
                                     <field name="day_two_cip_attendance" attrs="{'invisible': [('day_two_check', '=', False)]}"/>
                                     <field name="day_three_cip_attendance" attrs="{'invisible': [('day_three_check', '=', False)]}"/>
@@ -135,7 +141,6 @@
                             <field name="attendance_excel_ids" widget="one2many">
                                 <tree string="Attendance" editable="bottom">
                                     <field name="base_student_id"/>
-                                    <field name="student_name"/>
                                     <field name="day_one_attendance"
                                            attrs="{'invisible': [('day_one_check', '=', False)]}"/>
                                     <field name="day_two_attendance"
@@ -183,23 +188,23 @@
         <field name="view_mode">tree,form,activity</field>
     </record>
 
-    <record id="server_action_for_excel_student_name_changing" model="ir.actions.server">
-        <field name="name">Change excel student field</field>
-        <field name="model_id" ref="logic_cip.model_logic_cip_form"/>
-        <field name="binding_model_id" ref="logic_cip.model_logic_cip_form"/>
-        <field name="binding_view_types">list</field>
-        <field name="state">code</field>
-        <field name="code">action = records.action_excel_change_student_field_relation()</field>
-    </record>
+<!--    <record id="server_action_for_excel_student_name_changing" model="ir.actions.server">-->
+<!--        <field name="name">Change excel student field</field>-->
+<!--        <field name="model_id" ref="logic_cip.model_logic_cip_form"/>-->
+<!--        <field name="binding_model_id" ref="logic_cip.model_logic_cip_form"/>-->
+<!--        <field name="binding_view_types">list</field>-->
+<!--        <field name="state">code</field>-->
+<!--        <field name="code">action = records.action_excel_change_student_field_relation()</field>-->
+<!--    </record>-->
 
-    <record id="server_action_for_cip_student_name_changing" model="ir.actions.server">
-        <field name="name">Change cip student field</field>
-        <field name="model_id" ref="logic_cip.model_logic_cip_form"/>
-        <field name="binding_model_id" ref="logic_cip.model_logic_cip_form"/>
-        <field name="binding_view_types">list</field>
-        <field name="state">code</field>
-        <field name="code">action = records.action_cip_change_student_field_relation()</field>
-    </record>
+<!--    <record id="server_action_for_cip_student_name_changing" model="ir.actions.server">-->
+<!--        <field name="name">Change cip student field</field>-->
+<!--        <field name="model_id" ref="logic_cip.model_logic_cip_form"/>-->
+<!--        <field name="binding_model_id" ref="logic_cip.model_logic_cip_form"/>-->
+<!--        <field name="binding_view_types">list</field>-->
+<!--        <field name="state">code</field>-->
+<!--        <field name="code">action = records.action_cip_change_student_field_relation()</field>-->
+<!--    </record>-->
 
     <menuitem name="CIP"
               id="cip_main_menu"

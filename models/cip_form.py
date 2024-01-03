@@ -40,99 +40,142 @@ class CipForm(models.Model):
             students = self.env['logic.students'].sudo().search([('id', '=', j.student_id)])
             j.base_student_id = students.id
 
+    cip_attended_students_count = fields.Integer(compute='_compute_cip_attended_students_count', store=True)
+
+    @api.depends('cip_ids')
+    def _compute_cip_attended_students_count(self):
+        for record in self:
+            if record.cip_ids:
+                record.cip_attended_students_count = len(record.cip_ids)
+            else:
+                record.cip_attended_students_count = 0
+
+    @api.depends('attendance_excel_ids.stud_attendance')
+    def _compute_total_excel_attendance(self):
+        for record in self:
+            if record.attendance_excel_ids:
+                record.total_excel_attendance = sum(record.attendance_excel_ids.mapped('stud_attendance'))
+            else:
+                record.total_excel_attendance = 0
+
+    total_excel_attendance = fields.Float(compute='_compute_total_excel_attendance', store=True)
+
+    @api.depends('attendance_excel_ids')
+    def _compute_excel_attended_students_count(self):
+        for record in self:
+            if record.cip_ids:
+                record.excel_attended_students_count = len(record.cip_ids)
+            else:
+                record.excel_attended_students_count = 0
+
+    excel_attended_students_count = fields.Float(compute='_compute_excel_attended_students_count', store=True)
+
+    @api.depends('cip_ids.stud_attendance')
+    def _compute_total_cip_attendance(self):
+        for record in self:
+            if record.cip_ids:
+                record.total_cip_attendance = sum(record.cip_ids.mapped('stud_attendance'))
+            else:
+                record.total_cip_attendance = 0
+
+    total_cip_attendance = fields.Float(compute='_compute_total_cip_attendance', store=True)
 
     def _compute_excel_avg_attendance(self):
         for record in self:
-            if record.attendance_excel_ids:
-                total_attendance = 0
-                for excel_rec in record.attendance_excel_ids:
-                    if record.day_one_date:
-                        if excel_rec.day_one_attendance=='full_day':
-                            total_attendance+=1
-                        elif excel_rec.day_one_attendance=="half_day":
-                            total_attendance+=0.5
-                    if record.day_two_date:
-                        if excel_rec.day_two_attendance=='full_day':
-                            total_attendance+=1
-                        elif excel_rec.day_two_attendance=="half_day":
-                            total_attendance+=0.5
-                    if record.day_three_date:
+            record.excel_avg_attendance = record.total_excel_attendance / record.excel_attended_students_count
 
-                        if excel_rec.day_three_attendance=='full_day':
-                            total_attendance+=1
-                        elif excel_rec.day_three_attendance=="half_day":
-                            total_attendance+=0.5
-                if record.day_one_date and record.day_two_date and record.day_three_date:
-                    record.excel_avg_attendance = total_attendance/3
-                elif record.day_one_date and record.day_two_date:
-                    record.excel_avg_attendance = total_attendance/2
-                else:
-                    record.excel_avg_attendance = total_attendance
-            else:
-                record.excel_avg_attendance = 0
+            # if record.attendance_excel_ids:
+            #     total_attendance = 0
+            #     for excel_rec in record.attendance_excel_ids:
+            #         if record.day_one_date:
+            #             if excel_rec.day_one_attendance=='full_day':
+            #                 total_attendance+=1
+            #             elif excel_rec.day_one_attendance=="half_day":
+            #                 total_attendance+=0.5
+            #         if record.day_two_date:
+            #             if excel_rec.day_two_attendance=='full_day':
+            #                 total_attendance+=1
+            #             elif excel_rec.day_two_attendance=="half_day":
+            #                 total_attendance+=0.5
+            #         if record.day_three_date:
+            #
+            #             if excel_rec.day_three_attendance=='full_day':
+            #                 total_attendance+=1
+            #             elif excel_rec.day_three_attendance=="half_day":
+            #                 total_attendance+=0.5
+            #     if record.day_one_date and record.day_two_date and record.day_three_date:
+            #         record.excel_avg_attendance = total_attendance/3
+            #     elif record.day_one_date and record.day_two_date:
+            #         record.excel_avg_attendance = total_attendance/2
+            #     else:
+            #         record.excel_avg_attendance = total_attendance
+            # else:
+            #     record.excel_avg_attendance = 0
 
+    @api.depends('total_cip_attendance', 'cip_attended_students_count')
     def _compute_cip_avg_attendance(self):
         for record in self:
-            if record.cip_ids:
-                total_attendance = 0
-                for cip_rec in record.cip_ids:
-                    if record.cip_day_one:
-                        if cip_rec.day_one_cip_attendance == 'full_day':
-                            total_attendance+=1
-                        elif cip_rec.day_one_cip_attendance=="half_day":
-                            total_attendance+=0.5
-                    if record.cip_day_two:
-                        if cip_rec.day_two_cip_attendance == 'full_day':
-                            total_attendance += 1
-                        elif cip_rec.day_two_cip_attendance == "half_day":
-                            total_attendance += 0.5
-                    if record.cip_day_three:
+            record.cip_avg_attendance = record.total_cip_attendance / record.cip_attended_students_count
+            # if record.cip_ids:
+            #     total_attendance = 0
+            #     for cip_rec in record.cip_ids:
+            #         if record.cip_day_one:
+            #             if cip_rec.day_one_cip_attendance == 'full_day':
+            #                 total_attendance+=1
+            #             elif cip_rec.day_one_cip_attendance=="half_day":
+            #                 total_attendance+=0.5
+            #         if record.cip_day_two:
+            #             if cip_rec.day_two_cip_attendance == 'full_day':
+            #                 total_attendance += 1
+            #             elif cip_rec.day_two_cip_attendance == "half_day":
+            #                 total_attendance += 0.5
+            #         if record.cip_day_three:
+            #
+            #             if cip_rec.day_three_cip_attendance == 'full_day':
+            #                 total_attendance += 1
+            #             elif cip_rec.day_three_cip_attendance == "half_day":
+            #                 total_attendance += 0.5
+            #         if record.cip_day_four:
+            #
+            #             if cip_rec.day_four_cip_attendance == 'full_day':
+            #                 total_attendance += 1
+            #             elif cip_rec.day_four_cip_attendance == "half_day":
+            #                 total_attendance += 0.5
+            #         if record.cip_day_five:
+            #             if cip_rec.day_five_cip_attendance == 'full_day':
+            #                 total_attendance += 1
+            #             elif cip_rec.day_five_cip_attendance == "half_day":
+            #                 total_attendance += 0.5
+            #         if record.cip_day_six:
+            #             if cip_rec.day_six_cip_attendance == 'full_day':
+            #                 total_attendance += 1
+            #             elif cip_rec.day_six_cip_attendance == "half_day":
+            #                 total_attendance += 0.5
+            #         if record.cip_day_seven:
+            #             if cip_rec.day_seven_cip_attendance == 'full_day':
+            #                 total_attendance += 1
+            #             elif cip_rec.day_seven_cip_attendance == "half_day":
+            #                 total_attendance += 0.5
+            #     print(total_attendance, "total_attendance")
+            #
+            #     if record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five and record.cip_day_six and record.cip_day_seven:
+            #         record.cip_avg_attendance = total_attendance/7
+            #     elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five and record.cip_day_six:
+            #         record.cip_avg_attendance = total_attendance/6
+            #     elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five:
+            #         record.cip_avg_attendance = total_attendance/5
+            #     elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four:
+            #         record.cip_avg_attendance = total_attendance/4
+            #     elif record.cip_day_one and record.cip_day_two and record.cip_day_three:
+            #         record.cip_avg_attendance = total_attendance/3
+            #     elif record.cip_day_one and record.cip_day_two:
+            #         record.cip_avg_attendance = total_attendance/2
+            #
+            #     else:
+            #         record.cip_avg_attendance = total_attendance
+            # else:
+            #     record.cip_avg_attendance = 0
 
-                        if cip_rec.day_three_cip_attendance == 'full_day':
-                            total_attendance += 1
-                        elif cip_rec.day_three_cip_attendance == "half_day":
-                            total_attendance += 0.5
-                    if record.cip_day_four:
-
-                        if cip_rec.day_four_cip_attendance == 'full_day':
-                            total_attendance += 1
-                        elif cip_rec.day_four_cip_attendance == "half_day":
-                            total_attendance += 0.5
-                    if record.cip_day_five:
-                        if cip_rec.day_five_cip_attendance == 'full_day':
-                            total_attendance += 1
-                        elif cip_rec.day_five_cip_attendance == "half_day":
-                            total_attendance += 0.5
-                    if record.cip_day_six:
-                        if cip_rec.day_six_cip_attendance == 'full_day':
-                            total_attendance += 1
-                        elif cip_rec.day_six_cip_attendance == "half_day":
-                            total_attendance += 0.5
-                    if record.cip_day_seven:
-                        if cip_rec.day_seven_cip_attendance == 'full_day':
-                            total_attendance += 1
-                        elif cip_rec.day_seven_cip_attendance == "half_day":
-                            total_attendance += 0.5
-                print(total_attendance, "total_attendance")
-
-                if record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five and record.cip_day_six and record.cip_day_seven:
-                    record.cip_avg_attendance = total_attendance/7
-                elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five and record.cip_day_six:
-                    record.cip_avg_attendance = total_attendance/6
-                elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five:
-                    record.cip_avg_attendance = total_attendance/5
-                elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four:
-                    record.cip_avg_attendance = total_attendance/4
-                elif record.cip_day_one and record.cip_day_two and record.cip_day_three:
-                    record.cip_avg_attendance = total_attendance/3
-                elif record.cip_day_one and record.cip_day_two:
-                    record.cip_avg_attendance = total_attendance/2
-                elif record.cip_day_one:
-                    record.cip_avg_attendance = total_attendance/1
-                else:
-                    record.cip_avg_attendance = total_attendance
-            else:
-                record.cip_avg_attendance = 0
 
     @api.depends('batch_id')
     def _compute_batch_strength(self):
