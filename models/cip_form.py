@@ -21,8 +21,8 @@ class CipForm(models.Model):
     course_id = fields.Many2one('logic.base.courses', string='Course', related='batch_id.course_id')
     date = fields.Date('Date', default=lambda self: fields.Date.context_today(self))
     batch_strength = fields.Integer(string="Strength",compute = "_compute_batch_strength")
-    cip_avg_attendance = fields.Float(string="Average CIP Attendance",compute="_compute_cip_avg_attendance")
-    excel_avg_attendance = fields.Float(string="Average Excel Attendance",compute="_compute_excel_avg_attendance")
+    cip_avg_attendance = fields.Float(string="Average CIP Attendance", compute="_compute_cip_avg_attendance", store=True)
+    excel_avg_attendance = fields.Float(string="Average Excel Attendance", compute="_compute_excel_avg_attendance", store=True)
     digital_support_received = fields.Boolean(string='Digital Support Received')
     rating = fields.Selection(
         selection=[('0', 'No rating'), ('1', 'Very Poor'), ('2', 'Poor'), ('3', 'Average'), ('4', 'Good'),
@@ -62,9 +62,10 @@ class CipForm(models.Model):
 
     @api.depends('attendance_excel_ids')
     def _compute_excel_attended_students_count(self):
+        print('excel attendence count')
         for record in self:
-            if record.cip_ids:
-                record.excel_attended_students_count = len(record.cip_ids)
+            if record.attendance_excel_ids:
+                record.excel_attended_students_count = len(record.attendance_excel_ids)
             else:
                 record.excel_attended_students_count = 0
 
@@ -80,113 +81,27 @@ class CipForm(models.Model):
 
     total_cip_attendance = fields.Float(compute='_compute_total_cip_attendance', store=True)
 
+    @api.depends('excel_attended_students_count', 'total_excel_attendance')
     def _compute_excel_avg_attendance(self):
         for record in self:
-            record.excel_avg_attendance = record.total_excel_attendance / record.excel_attended_students_count
-
-            # if record.attendance_excel_ids:
-            #     total_attendance = 0
-            #     for excel_rec in record.attendance_excel_ids:
-            #         if record.day_one_date:
-            #             if excel_rec.day_one_attendance=='full_day':
-            #                 total_attendance+=1
-            #             elif excel_rec.day_one_attendance=="half_day":
-            #                 total_attendance+=0.5
-            #         if record.day_two_date:
-            #             if excel_rec.day_two_attendance=='full_day':
-            #                 total_attendance+=1
-            #             elif excel_rec.day_two_attendance=="half_day":
-            #                 total_attendance+=0.5
-            #         if record.day_three_date:
-            #
-            #             if excel_rec.day_three_attendance=='full_day':
-            #                 total_attendance+=1
-            #             elif excel_rec.day_three_attendance=="half_day":
-            #                 total_attendance+=0.5
-            #     if record.day_one_date and record.day_two_date and record.day_three_date:
-            #         record.excel_avg_attendance = total_attendance/3
-            #     elif record.day_one_date and record.day_two_date:
-            #         record.excel_avg_attendance = total_attendance/2
-            #     else:
-            #         record.excel_avg_attendance = total_attendance
-            # else:
-            #     record.excel_avg_attendance = 0
+            if record.excel_attended_students_count and record.total_excel_attendance:
+                if record.total_excel_attendance != 0 and record.excel_attended_students_count != 0:
+                    record.excel_avg_attendance = record.total_excel_attendance/record.excel_attended_students_count
 
     @api.depends('total_cip_attendance', 'cip_attended_students_count')
     def _compute_cip_avg_attendance(self):
         for record in self:
-            record.cip_avg_attendance = record.total_cip_attendance / record.cip_attended_students_count
-            # if record.cip_ids:
-            #     total_attendance = 0
-            #     for cip_rec in record.cip_ids:
-            #         if record.cip_day_one:
-            #             if cip_rec.day_one_cip_attendance == 'full_day':
-            #                 total_attendance+=1
-            #             elif cip_rec.day_one_cip_attendance=="half_day":
-            #                 total_attendance+=0.5
-            #         if record.cip_day_two:
-            #             if cip_rec.day_two_cip_attendance == 'full_day':
-            #                 total_attendance += 1
-            #             elif cip_rec.day_two_cip_attendance == "half_day":
-            #                 total_attendance += 0.5
-            #         if record.cip_day_three:
-            #
-            #             if cip_rec.day_three_cip_attendance == 'full_day':
-            #                 total_attendance += 1
-            #             elif cip_rec.day_three_cip_attendance == "half_day":
-            #                 total_attendance += 0.5
-            #         if record.cip_day_four:
-            #
-            #             if cip_rec.day_four_cip_attendance == 'full_day':
-            #                 total_attendance += 1
-            #             elif cip_rec.day_four_cip_attendance == "half_day":
-            #                 total_attendance += 0.5
-            #         if record.cip_day_five:
-            #             if cip_rec.day_five_cip_attendance == 'full_day':
-            #                 total_attendance += 1
-            #             elif cip_rec.day_five_cip_attendance == "half_day":
-            #                 total_attendance += 0.5
-            #         if record.cip_day_six:
-            #             if cip_rec.day_six_cip_attendance == 'full_day':
-            #                 total_attendance += 1
-            #             elif cip_rec.day_six_cip_attendance == "half_day":
-            #                 total_attendance += 0.5
-            #         if record.cip_day_seven:
-            #             if cip_rec.day_seven_cip_attendance == 'full_day':
-            #                 total_attendance += 1
-            #             elif cip_rec.day_seven_cip_attendance == "half_day":
-            #                 total_attendance += 0.5
-            #     print(total_attendance, "total_attendance")
-            #
-            #     if record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five and record.cip_day_six and record.cip_day_seven:
-            #         record.cip_avg_attendance = total_attendance/7
-            #     elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five and record.cip_day_six:
-            #         record.cip_avg_attendance = total_attendance/6
-            #     elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four and record.cip_day_five:
-            #         record.cip_avg_attendance = total_attendance/5
-            #     elif record.cip_day_one and record.cip_day_two and record.cip_day_three and record.cip_day_four:
-            #         record.cip_avg_attendance = total_attendance/4
-            #     elif record.cip_day_one and record.cip_day_two and record.cip_day_three:
-            #         record.cip_avg_attendance = total_attendance/3
-            #     elif record.cip_day_one and record.cip_day_two:
-            #         record.cip_avg_attendance = total_attendance/2
-            #
-            #     else:
-            #         record.cip_avg_attendance = total_attendance
-            # else:
-            #     record.cip_avg_attendance = 0
-
+            if record.total_cip_attendance and record.cip_attended_students_count:
+                if record.total_cip_attendance != 0 and record.cip_attended_students_count != 0:
+                    record.cip_avg_attendance = record.total_cip_attendance / record.cip_attended_students_count
 
     @api.depends('batch_id')
     def _compute_batch_strength(self):
         for record in self:
             if record.batch_id:
-                record.batch_strength = self.env['logic.students'].search_count([('batch_id','=',record.batch_id.id)])    
+                record.batch_strength = self.env['logic.students'].search_count([('batch_id', '=', record.batch_id.id)])
             else:
                 record.batch_strength = 0
-
-
-    
             
     type_of_training = fields.Selection([
         ('cip', 'CIP'), ('excel', 'Excel'),
@@ -232,7 +147,7 @@ class CipForm(models.Model):
 
     @api.onchange('batch_id')
     def onchange_students_attendance(self):
-        print(self.batch_id, 'batch_id')
+        # print(self.batch_id, 'batch_id')
         students = self.env['logic.students'].search([('batch_id', '=', self.batch_id.id)])
         abc = []
         unlink_commands = [(3, child.id) for child in self.attendance_excel_ids]
