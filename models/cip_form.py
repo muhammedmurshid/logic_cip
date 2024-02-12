@@ -20,7 +20,7 @@ class CipForm(models.Model):
     branch = fields.Many2one('logic.base.branches', related='batch_id.branch_id', string='Branch')
     course_id = fields.Many2one('logic.base.courses', string='Course', related='batch_id.course_id')
     date = fields.Date('Date', default=lambda self: fields.Date.context_today(self))
-    batch_strength = fields.Integer(string="Strength",compute = "_compute_batch_strength")
+    batch_strength = fields.Integer(string="Strength", compute="_compute_batch_strength")
     cip_avg_attendance = fields.Float(string="Average CIP Attendance", compute="_compute_cip_avg_attendance", store=True)
     excel_avg_attendance = fields.Float(string="Average Excel Attendance", compute="_compute_excel_avg_attendance", store=True)
     digital_support_received = fields.Boolean(string='Digital Support Received')
@@ -185,6 +185,7 @@ class CipForm(models.Model):
         activity = self.env['mail.activity'].search([('res_id', '=', self.id), (
             'activity_type_id', '=', self.env.ref('logic_cip.mail_cip_activity').id)])
         activity.action_feedback('CIP Started')
+
 
     def action_project(self):
         for rec in self.cip_ids:
