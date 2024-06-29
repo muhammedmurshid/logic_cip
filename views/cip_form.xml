@@ -38,6 +38,7 @@
                         <group>
 
                             <field name="batch_id" context="{'custom_name_display':True}"/>
+                            <field name="batch_ids" widget="many2many_tags" placeholder="if you want multiple batches"/>
                             <field name="course_id"/>
                             <field name="branch"/>
                             <field name="date"/>

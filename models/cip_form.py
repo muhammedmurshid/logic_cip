@@ -17,12 +17,16 @@ class CipForm(models.Model):
 
     name = fields.Char()
     batch_id = fields.Many2one('logic.base.batch', string='Batch', required=True)
+    batch_ids = fields.Many2many('logic.base.batch', string='Batches', help="if you want to add multiple batch",
+                                 placeholder="if you want to add multiple batch")
     branch = fields.Many2one('logic.base.branches', related='batch_id.branch_id', string='Branch')
     course_id = fields.Many2one('logic.base.courses', string='Course', related='batch_id.course_id')
     date = fields.Date('Date', default=lambda self: fields.Date.context_today(self))
     batch_strength = fields.Integer(string="Strength", compute="_compute_batch_strength")
-    cip_avg_attendance = fields.Float(string="Average CIP Attendance", compute="_compute_cip_avg_attendance", store=True)
-    excel_avg_attendance = fields.Float(string="Average Excel Attendance", compute="_compute_excel_avg_attendance", store=True)
+    cip_avg_attendance = fields.Float(string="Average CIP Attendance", compute="_compute_cip_avg_attendance",
+                                      store=True)
+    excel_avg_attendance = fields.Float(string="Average Excel Attendance", compute="_compute_excel_avg_attendance",
+                                        store=True)
     digital_support_received = fields.Boolean(string='Digital Support Received')
     rating = fields.Selection(
         selection=[('0', 'No rating'), ('1', 'Very Poor'), ('2', 'Poor'), ('3', 'Average'), ('4', 'Good'),
@@ -86,7 +90,7 @@ class CipForm(models.Model):
         for record in self:
             if record.excel_attended_students_count and record.total_excel_attendance:
                 if record.total_excel_attendance != 0 and record.excel_attended_students_count != 0:
-                    record.excel_avg_attendance = record.total_excel_attendance/record.excel_attended_students_count
+                    record.excel_avg_attendance = record.total_excel_attendance / record.excel_attended_students_count
 
     @api.depends('total_cip_attendance', 'cip_attended_students_count')
     def _compute_cip_avg_attendance(self):
@@ -102,7 +106,7 @@ class CipForm(models.Model):
                 record.batch_strength = self.env['logic.students'].search_count([('batch_id', '=', record.batch_id.id)])
             else:
                 record.batch_strength = 0
-            
+
     type_of_training = fields.Selection([
         ('cip', 'CIP'), ('excel', 'Excel'),
     ], string='Type of Training')
@@ -145,39 +149,63 @@ class CipForm(models.Model):
                                note=f'Excel reminder.')
         self.state = 'scheduled'
 
-    @api.onchange('batch_id')
+    @api.onchange('batch_id', 'batch_ids')
     def onchange_students_attendance(self):
+        print(self.batch_ids.ids, 'batch_id')
         # print(self.batch_id, 'batch_id')
-        students = self.env['logic.students'].search([('batch_id', '=', self.batch_id.id)])
+        students = self.env['logic.students'].search([])
+        # for j in students:
+        #     if self.batch_ids.ids == j.batch_id:
+        #         print(i.name, 'students')
+
         abc = []
         unlink_commands = [(3, child.id) for child in self.attendance_excel_ids]
         self.write({'attendance_excel_ids': unlink_commands})
 
         for i in students:
-            res_list = {
-                # 'student_name': i.name,
-                'student_id': i.id,
-                'base_student_id': i.id
+            if i.batch_id.id == self.batch_id.id:
+                res_list = {
+                    # 'student_name': i.name,
+                    'student_id': i.id,
+                    'base_student_id': i.id
 
-            }
-            abc.append((0, 0, res_list))
+                }
+                abc.append((0, 0, res_list))
+            if i.batch_id.id in self.batch_ids.ids:
+                res_list = {
+                    # 'student_name': i.name,
+                    'student_id': i.id,
+                    'base_student_id': i.id
+
+                }
+                abc.append((0, 0, res_list))
             print(abc, 'abc')
         self.attendance_excel_ids = abc
 
     def action_start(self):
-        students = self.env['logic.students'].search([('batch_id', '=', self.batch_id.id)])
+        students = self.env['logic.students'].search([])
         abc = []
         unlink_commands = [(3, child.id) for child in self.cip_ids]
         self.write({'cip_ids': unlink_commands})
 
         for i in students:
-            res_list = {
-                # 'name': i.name,
-                'student_id': i.id,
-                'base_student_id': i.id
+            if i.batch_id.id == self.batch_id.id:
+                res_list = {
+                    # 'student_name': i.name,
+                    'student_id': i.id,
+                    'base_student_id': i.id
 
-            }
-            abc.append((0, 0, res_list))
+                }
+                abc.append((0, 0, res_list))
+            if i.batch_id.id in self.batch_ids.ids:
+                res_list = {
+                    # 'student_name': i.name,
+                    'student_id': i.id,
+                    'base_student_id': i.id
+
+                }
+                abc.append((0, 0, res_list))
+            print(abc, 'abc')
         self.cip_ids = abc
         for rec in self.cip_ids:
             rec.state = 'excel_started'
@@ -185,7 +213,6 @@ class CipForm(models.Model):
         activity = self.env['mail.activity'].search([('res_id', '=', self.id), (
             'activity_type_id', '=', self.env.ref('logic_cip.mail_cip_activity').id)])
         activity.action_feedback('CIP Started')
-
 
     def action_project(self):
         for rec in self.cip_ids:
@@ -238,7 +265,6 @@ class CipForm(models.Model):
             rec.state = 'certificate'
         self.state = 'certificate'
         self.cip_ids.certificate_submit = True
-
 
     def action_completed(self):
         for rec in self.cip_ids:
@@ -345,8 +371,8 @@ class CipForm(models.Model):
             self.attendance_excel_ids.day_three_check = False
             self.attendance_excel_ids.day_three_attendance = False
 
-
-    @api.onchange('cip_day_one', 'cip_day_two', 'cip_day_three', 'cip_day_four', 'cip_day_five', 'cip_day_six', 'cip_day_seven')
+    @api.onchange('cip_day_one', 'cip_day_two', 'cip_day_three', 'cip_day_four', 'cip_day_five', 'cip_day_six',
+                  'cip_day_seven')
     def _onchange_cip_date_attendance(self):
         print('yes')
         if self.cip_day_one:
@@ -413,26 +439,26 @@ class ExcelClassAttendance(models.Model):
                                           'Day 2')
     day_three_attendance = fields.Selection([('full_day', 'Full Day'), ('half_day', 'Half Day'), ('absent', 'Absent')],
                                             'Day 3')
-    
-    stud_attendance = fields.Float(string="Attendance",compute="_compute_stud_attendance")
+
+    stud_attendance = fields.Float(string="Attendance", compute="_compute_stud_attendance")
 
     def _compute_stud_attendance(self):
         for record in self:
             total_present = 0
-            if record.day_one_attendance=="full_day":
-                total_present+=1
-            elif record.day_one_attendance=="half_day":
-                total_present+=0.5
+            if record.day_one_attendance == "full_day":
+                total_present += 1
+            elif record.day_one_attendance == "half_day":
+                total_present += 0.5
 
-            if record.day_two_attendance=="full_day":
-                total_present+=1
-            elif record.day_two_attendance=="half_day":
-                total_present+=0.5
+            if record.day_two_attendance == "full_day":
+                total_present += 1
+            elif record.day_two_attendance == "half_day":
+                total_present += 0.5
 
-            if record.day_three_attendance=="full_day":
-                total_present+=1
-            elif record.day_three_attendance=="half_day":
-                total_present+=0.5
+            if record.day_three_attendance == "full_day":
+                total_present += 1
+            elif record.day_three_attendance == "half_day":
+                total_present += 0.5
             # if record.day_four_attendance=="full_day":
             #     total_present+=1
             # elif record.day_four_attendance=="half_day":
